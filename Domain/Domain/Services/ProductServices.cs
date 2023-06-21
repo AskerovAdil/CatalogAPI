@@ -11,15 +11,13 @@ using System.Threading.Tasks;
 
 namespace Domain.Services
 {
-    public class ProductService : IService<Product>
+    public class ProductServices : IProductService
     {
-        private readonly IRepository<Product> _productRepository;
-        private readonly ILogger<ProductService> _logger;
+        private readonly IEntityBaseRepository<Product> _productRepository;
 
-        public ProductService(IRepository<Product> productRepository, ILogger<ProductService> logger)
+        public ProductServices(IEntityBaseRepository<Product> productRepository)
         {
             _productRepository = productRepository;
-            _logger = logger;
         }
 
         public async Task AddAsync(Product product)
@@ -30,7 +28,6 @@ namespace Domain.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error adding product");
                 throw;
             }
         }
@@ -43,7 +40,6 @@ namespace Domain.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error updating product");
                 throw;
             }
         }
@@ -56,14 +52,13 @@ namespace Domain.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error deleting product");
                 throw;
             }
         }
 
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _productRepository.GetAllAsync();
+            return await _productRepository.GetAllAsync(x=>x.Category);
         }
 
         public async Task<Product> GetByIdAsync(int id)

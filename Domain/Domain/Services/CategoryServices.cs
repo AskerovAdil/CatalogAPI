@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Services
 {
-    public class CategoryService : IService<Category>
+    public class CategoryServices : ICategoryService
     {
-        private readonly IRepository<Category> _categoryRepository;
+        private readonly IEntityBaseRepository<Category> _categoryRepository;
 
-        public CategoryService(IRepository<Category> categoryRepository)
+        public CategoryServices(IEntityBaseRepository<Category> categoryRepository)
         {
             _categoryRepository = categoryRepository;
         }
@@ -37,7 +37,7 @@ namespace Domain.Services
 
         public async Task<List<Category>> GetAllAsync()
         {
-            return await _categoryRepository.GetAllAsync();
+            return await _categoryRepository.GetAllAsync(x=>x.Products);
         }
 
         public async Task<Category> GetByIdAsync(int id)

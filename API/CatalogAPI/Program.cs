@@ -26,8 +26,8 @@ namespace CatalogAPI
    
             builder.Services.AddScoped<ICategoryService, CategoryServices>();
             builder.Services.AddScoped<IProductService, ProductServices>();
-            builder.Services.AddScoped<IRepository<Category>, Repository<Category>>();
-            builder.Services.AddScoped<IRepository<Product>, Repository<Product>>();
+            builder.Services.AddScoped<IEntityBaseRepository<Category>, EntityBaseRepository<Category>>();
+            builder.Services.AddScoped<IEntityBaseRepository<Product>, EntityBaseRepository<Product>>();
             builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
