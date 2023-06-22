@@ -8,12 +8,14 @@ namespace CatalogAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class CatalogController : ControllerBase
+    public class CategoryController : ControllerBase
     {
         private readonly ICategoryService _categoryService;
-
-        public CatalogController(ICategoryService categoryService)
+        private readonly ILogger<CategoryServices> _logger;
+        
+        public CategoryController(ICategoryService categoryService, ILogger<CategoryServices> logger)
         {
+            _logger = logger;
             _categoryService = categoryService;
         }
         [HttpGet]
@@ -30,7 +32,7 @@ namespace CatalogAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Category>> AddAsync([FromBody] string name)
+        public async Task<ActionResult<Category>> AddAsync([FromForm] string name)
         {
             try
             {
@@ -40,21 +42,24 @@ namespace CatalogAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error adding new category");
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
+
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAsync(int id, [FromBody] string name)
         {
             try
             {
-                var updateCategory = new Category() {Id=id ,Name = name };
+                var updateCategory = new Category() { Id = id, Name = name };
 
                 await _categoryService.UpdateAsync(updateCategory);
                 return Ok(updateCategory);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating category with id {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
@@ -69,6 +74,7 @@ namespace CatalogAPI.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error deleting category with id {Id}", id);
                 return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
             }
         }
