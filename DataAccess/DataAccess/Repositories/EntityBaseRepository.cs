@@ -19,31 +19,62 @@ namespace DataAccess.Repositories
         {
             _context = context;
         }
+
         public async Task AddAsync(T entity)
         {
             if (entity == null)
+            {
                 throw new ArgumentNullException(nameof(entity));
+            }
 
-            await _context.Set<T>().AddAsync(entity);
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Set<T>().AddAsync(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding entity to database.", ex);
+            }
         }
 
         public async Task UpdateAsync(T entity)
         {
             if (entity == null)
+            {
                 throw new ArgumentNullException(nameof(entity));
+            }
 
-            _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Set<T>().Update(entity);
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error updating entity in database.", ex);
+            }
         }
 
         public async Task DeleteAsync(int id)
         {
-            var entity = await GetByIdAsync(id);
-            if (entity != null)
+            if (id < 0)
             {
-                _context.Set<T>().Remove(entity);
-                await _context.SaveChangesAsync();
+                throw new ArgumentException("The id cannot be negative.", nameof(id));
+            }
+
+            try
+            {
+                var entity = await GetByIdAsync(id);
+                if (entity != null)
+                {
+                    _context.Set<T>().Remove(entity);
+                    await _context.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error deleting entity from database.", ex);
             }
         }
 
@@ -57,28 +88,37 @@ namespace DataAccess.Repositories
                     query = query.Include(includeProperty);
                 }
 
-                return query.ToList();
+                return await query.ToListAsync();
             }
-            catch
+            catch (Exception ex)
             {
-                throw new InvalidOperationException($"The list of entities is null.");
+                throw new Exception("Error getting list of entities from database.", ex);
             }
-
         }
 
         public async Task<T> GetByIdAsync(int id)
         {
             if (id < 0)
+            {
                 throw new ArgumentException("The id cannot be negative.", nameof(id));
+            }
 
-            var entity = await _context.Set<T>().FindAsync(id);
-            if (entity == null)
-                throw new InvalidOperationException("The entity with the specified id was not found.");
+            try
+            {
+                var entity = await _context.Set<T>().FindAsync(id);
+                if (entity == null)
+                {
+                    throw new InvalidOperationException("The entity with the specified id was not found.");
+                }
 
-            return entity;
+                return entity;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error getting entity from database.", ex);
+            }
         }
-    }
-    /*    public class Repository<T> : IRepository<T> where T : class
+    }    /*    public class Repository<T> : IRepository<T> where T : class
         {
             private readonly ApplicationDbContext _context;
 
