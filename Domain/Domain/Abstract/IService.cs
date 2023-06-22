@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Abstract
 {
-    public interface IService<T>
+    public interface IService<T> 
     {
         Task AddAsync(T entity);
         Task UpdateAsync(T entity);
