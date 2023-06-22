@@ -6,6 +6,8 @@ using CatalogAPI.Profiles;
 using Domain.Abstract;
 using Domain.Services;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Events;
 
 namespace CatalogAPI
 {
@@ -23,7 +25,19 @@ namespace CatalogAPI
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-   
+
+            builder.Host.ConfigureLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddSerilog(new LoggerConfiguration()
+                    .MinimumLevel.Debug()
+                    .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                    .Enrich.FromLogContext()
+                    .WriteTo.Console()
+                    .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
+                    .CreateLogger());
+            });
+
             builder.Services.AddScoped<ICategoryService, CategoryServices>();
             builder.Services.AddScoped<IProductService, ProductServices>();
             builder.Services.AddScoped<IEntityBaseRepository<Category>, EntityBaseRepository<Category>>();

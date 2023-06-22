@@ -14,10 +14,12 @@ namespace Domain.Services
     public class ProductServices : IProductService
     {
         private readonly IEntityBaseRepository<Product> _productRepository;
+        private readonly ILogger<ProductServices> _logger;
 
-        public ProductServices(IEntityBaseRepository<Product> productRepository)
+        public ProductServices(IEntityBaseRepository<Product> productRepository, ILogger<ProductServices> logger)
         {
             _productRepository = productRepository;
+            _logger = logger;
         }
 
         public async Task AddAsync(Product product)
@@ -28,7 +30,8 @@ namespace Domain.Services
             }
             catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error adding product to database.");
+                throw new Exception("Error adding product to database.", ex);
             }
         }
 
@@ -40,7 +43,8 @@ namespace Domain.Services
             }
             catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error updating product in database.");
+                throw new Exception("Error updating product in database.", ex);
             }
         }
 
@@ -52,18 +56,35 @@ namespace Domain.Services
             }
             catch (Exception ex)
             {
-                throw;
+                _logger.LogError(ex, "Error deleting product from database.");
+                throw new Exception("Error deleting product from database.", ex);
             }
         }
 
         public async Task<List<Product>> GetAllAsync()
         {
-            return await _productRepository.GetAllAsync(x=>x.Category);
+            try
+            {
+                return await _productRepository.GetAllAsync(x => x.Category);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting list of products from database.");
+                throw new Exception("Error getting list of products from database.", ex);
+            }
         }
 
         public async Task<Product> GetByIdAsync(int id)
         {
-            return await _productRepository.GetByIdAsync(id);
+            try
+            {
+                return await _productRepository.GetByIdAsync(id);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting product from database.");
+                throw new Exception("Error getting product from database.", ex);
+            }
         }
     }
 }
